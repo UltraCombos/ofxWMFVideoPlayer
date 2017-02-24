@@ -17,91 +17,99 @@ class ofxWMFVideoPlayer;
 
 
 class CPlayer;
-class ofxWMFVideoPlayer {
+class ofxWMFVideoPlayer : public ofBaseVideoPlayer {
 
-	private:
-		static int  _instanceCount;
-		
-		
-		HWND		_hwndPlayer;
-		
-		BOOL bRepaintClient;
-		
-		
-		int _width;
-		int _height;
+private:
+	static int _instanceCount;
 
 
-		bool _waitForLoadedToPlay;
-		bool _isLooping;
-		bool _wantToSetVolume;
-		float _currentVolume;
+	HWND _hwndPlayer;
 
-		bool _sharedTextureCreated;
-		
-		ofTexture _tex;
-	
-		BOOL InitInstance();
-
-		
-		void                OnPlayerEvent(HWND hwnd, WPARAM pUnkPtr);
-
-		float _frameRate;
+	BOOL bRepaintClient;
 
 
+	int _width;
+	int _height;
 
-	public:
-	CPlayer*	_player;
+
+	bool _waitForLoadedToPlay;
+	bool _isLooping;
+	bool _wantToSetVolume;
+	float _currentVolume;
+
+	bool _sharedTextureCreated;
+
+	ofTexture _tex;
+
+	BOOL InitInstance();
+
+
+	void OnPlayerEvent(HWND hwnd, WPARAM pUnkPtr);
+
+	float _frameRate;
+
+
+
+public:
+	CPlayer* _player;
 
 	int _id;
 
-	
+
 	ofxWMFVideoPlayer();
-	 ~ofxWMFVideoPlayer();
+	~ofxWMFVideoPlayer();
 
-	 bool				loadMovie(string name);
-	 //bool 				loadMovie(string name_left, string name_right) ;
-	 void				close();
-	 void				update();
-	
-	 void				play();
-	 void				stop();		
-	 void				pause();
+	bool				load(string name) override;
 
-	 float				getPosition();
-	 float				getDuration();
-	 float				getFrameRate();
+	void				close() override;
+	void				update() override;
 
-	 void				setPosition(float pos);
+	void				play() override;
+	void				stop() override;
+	void				pause();
 
-	 void				setVolume(float vol);
-	 float				getVolume();
+	ofTexture *        getTexturePtr() override;
 
-	 float				getHeight();
-	 float				getWidth();
+	float				getPosition() const override;
+	float				getDuration() const override;
+	float				getFrameRate();
 
-	 bool				isPlaying(); 
-	 bool				isStopped();
-	 bool				isPaused();
+	void				setPosition(float pos) override;
 
-	 void				setLoop(bool isLooping);
-	 bool				isLooping() { return _isLooping; }
+	void				setVolume(float vol) override;
+	float				getVolume();
 
+	float				getHeight();
+	float				getWidth();
 
+	bool				isPlaying() const override;
+	bool				isStopped();
+	bool				isPaused() const override;
 
-	
+	void				setLoopState(ofLoopType state) override;
 
 
+	void draw(int x, int y, int w, int h);
+	void draw(int x, int y) { draw(x, y, getWidth(), getHeight()); }
 
 
-	void draw(int x, int y , int w, int h);
-	void draw(int x, int y) { draw(x,y,getWidth(),getHeight()); }
-
-
-	HWND getHandle() { return _hwndPlayer;}
+	HWND getHandle() { return _hwndPlayer; }
 	LRESULT WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	static void forceExit();
 
 
+	// not implement yet
+	ofPixels pix;
+
+	ofPixels & getPixels() override;
+	const ofPixels & getPixels() const override;
+	bool isFrameNew() const override;
+	bool setPixelFormat(ofPixelFormat pixelFormat) override;
+	ofPixelFormat getPixelFormat() const override;
+	float getWidth() const override;
+	float getHeight() const override;
+	bool isLoaded() const override;
+	bool getIsMovieDone() const override;
+	int getTotalNumFrames() const override;
 };
