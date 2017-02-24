@@ -111,5 +111,8 @@ public:
 	float getHeight() const override;
 	bool isLoaded() const override;
 	bool getIsMovieDone() const override;
+	int getCurrentFrame() const override;
 	int getTotalNumFrames() const override;
+	void setPaused(bool bPause) override;
+	void setFrame(int frame) override;
 };

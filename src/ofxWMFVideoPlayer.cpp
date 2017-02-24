@@ -454,10 +454,30 @@ bool ofxWMFVideoPlayer::isLoaded() const
 
 bool ofxWMFVideoPlayer::getIsMovieDone() const
 {
-	return (_player->GetState() == Paused) && (_player->getPosition() > 0.0f);
+	return _player->GetState() == Stopped;
+}
+
+int ofxWMFVideoPlayer::getCurrentFrame() const
+{
+	return _player->getFrameRate() * _player->getPosition();
 }
 
 int ofxWMFVideoPlayer::getTotalNumFrames() const
 {
 	return _player->getFrameRate() * _player->getDuration();
+}
+
+void ofxWMFVideoPlayer::setPaused(bool bPause)
+{
+	if (bPause)
+		_player->Pause();
+	else
+		_player->Play();
+}
+
+void ofxWMFVideoPlayer::setFrame(int frame)
+{
+	float pos = (float)frame / getTotalNumFrames();
+	pos *= _player->getDuration();
+	_player->setPosition(pos);
 }

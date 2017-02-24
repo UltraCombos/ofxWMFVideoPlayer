@@ -242,7 +242,7 @@ HRESULT CPlayer::OpenMultipleURL(vector<const WCHAR *> &urls)
 
 		const WCHAR* sURL = urls[i];
 		// Create the media source.
-		hr = CreateMediaSource(sURL, &source);
+		hr = MediaFoundationSamples::CreateMediaSource(sURL, &source);
 		if (FAILED(hr))
 		{
 			goto done;
@@ -353,7 +353,7 @@ HRESULT CPlayer::OpenURL(const WCHAR *sURL)
 
 
     // Create the media source.
-    hr = CreateMediaSource(sURL, &m_pSource);
+    hr = MediaFoundationSamples::CreateMediaSource(sURL, &m_pSource);
     if (FAILED(hr))
     {
         goto done;
@@ -450,36 +450,39 @@ HRESULT CPlayer::setPosition(float pos)
 		return S_FALSE;
 	}
 
+	bool isPaused = GetState() == Paused;
+
 /*	bool wasPlaying = (m_state == Started);
 	m_pSession->Pause();
 	m_state = Paused;*/
 
 	//Create variant for seeking information
 	PROPVARIANT varStart;
-	PropVariantInit(&varStart);
+	//PropVariantInit(&varStart);
 	varStart.vt = VT_I8;
-	varStart.hVal.QuadPart = pos* 10000000.0; //i.e. seeking to pos // should be MFTIME and not float :(
-
-
-	HRESULT hr = m_pSession->Start(&GUID_NULL,&varStart);
-
-	if (SUCCEEDED(hr))
-	{
-
-		m_state = Started;
+	varStart.hVal.QuadPart = pos * 10000000.0; //i.e. seeking to pos // should be MFTIME and not float :(
 	
+//	HRESULT hr = m_pSession->Start(&GUID_NULL,&varStart);
+	HRESULT hr = m_pSession->Start(NULL, &varStart);
+	
+	if (isPaused)
+		m_pSession->Pause();
+#if 0
+	if (SUCCEEDED(hr))
+	{ 
+		m_state = Started; 
 	}
 	else 
 	{
 		printf("ofxWMFPlayer : Error while seeking\n");
 		return S_FALSE;
 	}
-
+#endif
 
 	/*if (!wasPlaying) m_pSession->Pause();
 	m_state = Paused;*/
 
-	PropVariantClear(&varStart);
+	//PropVariantClear(&varStart);
 
 
 
@@ -719,8 +722,8 @@ HRESULT CPlayer::OnPresentationEnded(IMFMediaEvent *pEvent)
 {
 
 		m_pSession->Pause();
-		m_state = Paused;
-
+		m_state = Stopped;
+		//cout << "OnPresentationEnded" << endl;
 		//Create variant for seeking information
 		PROPVARIANT varStart;
 		PropVariantInit(&varStart);
